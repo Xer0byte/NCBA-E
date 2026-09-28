@@ -92,6 +92,20 @@ export default function App() {
         ☰
       </button>
 
+      {/* Backdrop overlay for mobile menu */}
+      {menuOpen && (
+        <div
+          onClick={() => setMenuOpen(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.65)',
+            backdropFilter: 'blur(3px)',
+            zIndex: 999,
+          }}
+        />
+      )}
+
       {/* Menu Sidebar (100% same links as user's menuSidebar) */}
       <div className={`menu-sidebar ${menuOpen ? 'active' : ''}`} id="menuSidebar">
         <button className={currentPage === 'index.html' ? 'active' : ''} onClick={() => navigateTo('index.html')}>Home</button>
@@ -300,6 +314,19 @@ function AttendancePage({ navigateTo }: { navigateTo: (page: string) => void }) 
       <button className="toggle-btn" onClick={toggleSidebar}>
         {sidebarActive ? 'Close Schedule' : 'Toggle Schedule'}
       </button>
+
+      {/* Backdrop for Schedule Sidebar */}
+      {sidebarActive && (
+        <div
+          onClick={() => setSidebarActive(false)}
+          style={{
+            position: 'fixed',
+            inset: 0,
+            backgroundColor: 'rgba(0, 0, 0, 0.6)',
+            zIndex: 998,
+          }}
+        />
+      )}
 
       <div className={`sidebar ${sidebarActive ? 'active' : ''}`} id="sidebar">
         <h3>5-C-2 Faculty Schedule</h3>
