@@ -1,0 +1,6 @@
+{
+  "name": "NCBA&E 4-C-2 Portal",
+  "description": "NCBA&E Section 5-C-2 Student Portal with Attendance System, Faculty Directory, Announcements, Schedule, and Groups.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
