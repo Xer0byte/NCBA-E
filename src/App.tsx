@@ -108,6 +108,16 @@ export default function App() {
 
       {/* Menu Sidebar (100% same links as user's menuSidebar) */}
       <div className={`menu-sidebar ${menuOpen ? 'active' : ''}`} id="menuSidebar">
+        <div style={{ width: '100%', display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingBottom: '0.8rem', borderBottom: '1px solid var(--border)' }}>
+          <span style={{ fontWeight: 800, color: 'var(--primary)', fontSize: '1.05rem', letterSpacing: '0.5px' }}>PORTAL MENU</span>
+          <button
+            onClick={() => setMenuOpen(false)}
+            style={{ background: 'none', border: 'none', color: 'var(--muted)', fontSize: '1.4rem', cursor: 'pointer', padding: '0.2rem 0.5rem' }}
+            aria-label="Close Menu"
+          >
+            ✕
+          </button>
+        </div>
         <button className={currentPage === 'index.html' ? 'active' : ''} onClick={() => navigateTo('index.html')}>Home</button>
         <button className={currentPage === 'faculty.html' ? 'active' : ''} onClick={() => navigateTo('faculty.html')}>Faculty</button>
         <button className={currentPage === 'announcements.html' ? 'active' : ''} onClick={() => navigateTo('announcements.html')}>Announcements</button>
@@ -141,24 +151,89 @@ export default function App() {
 }
 
 // ─────────────────────────────────────────────────────────────
-// 1. INDEX.HTML (Home / Welcome)
+// 1. INDEX.HTML (Home / Welcome Hub)
 // ─────────────────────────────────────────────────────────────
 function IndexPage({ navigateTo }: { navigateTo: (page: string) => void }) {
   return (
-    <>
-      <img src={ncbaeLogo} alt="NCBA&E Logo" className="welcome-logo" style={{ marginTop: '2rem' }} />
-      <div className="welcome-text">Welcome to NCBA&amp;E</div>
-      <div className="main-nav">
-        <button className="nav-link" onClick={() => navigateTo('attendance.html')}>Attendance</button>
-        <button className="nav-link" onClick={() => navigateTo('groups.html')}>Groups</button>
-        <button className="nav-link" onClick={() => navigateTo('live-attendance.html')}>Live Attendance</button>
+    <div className="home-hero-container">
+      <div className="hero-badge">
+        <span className="badge-pulse"></span>
+        Official Class Portal • Fall 2026
       </div>
-      <div className="main-nav" style={{ marginTop: '0.5rem' }}>
-        <button className="nav-link" onClick={() => navigateTo('announcements.html')}>Announcements</button>
-        <button className="nav-link" onClick={() => navigateTo('faculty.html')}>Faculty</button>
-        <button className="nav-link" onClick={() => navigateTo('schedule.html')}>Schedule</button>
+
+      <img src={ncbaeLogo} alt="NCBA&E Logo" className="welcome-logo" />
+
+      <h1 className="welcome-title">
+        NCBA&amp;E <span>SECTION 5-C-2</span>
+      </h1>
+      <p className="welcome-subtext">
+        Computer Science Department • Fast, Reliable &amp; Multi-Device Student Portal
+      </p>
+
+      {/* Quick Launchpad Cards */}
+      <div className="home-action-grid">
+        <div className="action-card" onClick={() => navigateTo('attendance.html')}>
+          <div className="action-icon">✍️</div>
+          <div className="action-info">
+            <h3>Mark Attendance</h3>
+            <p>Daily class presence for Section 5-C-2</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
+
+        <div className="action-card" onClick={() => navigateTo('live-attendance.html')}>
+          <div className="action-icon">📊</div>
+          <div className="action-info">
+            <h3>Live Attendance</h3>
+            <p>Real-time records, counts &amp; copy tools</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
+
+        <div className="action-card" onClick={() => navigateTo('schedule.html')}>
+          <div className="action-icon">📅</div>
+          <div className="action-info">
+            <h3>Weekly Schedule</h3>
+            <p>Timetable, rooms &amp; lecture timings</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
+
+        <div className="action-card" onClick={() => navigateTo('faculty.html')}>
+          <div className="action-icon">👨‍🏫</div>
+          <div className="action-info">
+            <h3>Faculty Directory</h3>
+            <p>Professors, emails, rooms &amp; timings</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
+
+        <div className="action-card" onClick={() => navigateTo('groups.html')}>
+          <div className="action-icon">💬</div>
+          <div className="action-info">
+            <h3>WhatsApp Groups</h3>
+            <p>All official course community links</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
+
+        <div className="action-card" onClick={() => navigateTo('announcements.html')}>
+          <div className="action-icon">📢</div>
+          <div className="action-info">
+            <h3>Announcements</h3>
+            <p>Important class notices &amp; submissions</p>
+          </div>
+          <span className="action-arrow">→</span>
+        </div>
       </div>
-    </>
+
+      {/* Direct Quick Nav Pills */}
+      <div className="quick-pill-nav">
+        <button onClick={() => navigateTo('profile.html')}>👤 My Profile</button>
+        <button onClick={() => navigateTo('contact-us.html')}>📩 Contact Us</button>
+        <button onClick={() => navigateTo('settings.html')}>⚙️ Settings</button>
+      </div>
+    </div>
   );
 }
 
@@ -1411,7 +1486,7 @@ function SchedulePage({ navigateTo }: { navigateTo: (page: string) => void }) {
     }
 
     try {
-      localStorage.setItem('schedule', JSON.stringify(list));
+      localStorage.setItem('schedule_5c2', JSON.stringify(list));
       setSchedule(list);
       alert('Saved successfully!');
       setDay('');
@@ -1440,7 +1515,7 @@ function SchedulePage({ navigateTo }: { navigateTo: (page: string) => void }) {
     if (!isAdmin || !confirm('Delete this entry?')) return;
     const list = schedule.filter((_, i) => i !== index);
     try {
-      localStorage.setItem('schedule', JSON.stringify(list));
+      localStorage.setItem('schedule_5c2', JSON.stringify(list));
       setSchedule(list);
     } catch (e) {}
   };
