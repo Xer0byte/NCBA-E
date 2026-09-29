@@ -253,6 +253,16 @@ function AttendancePage({ navigateTo }: { navigateTo: (page: string) => void }) 
   const [successTime, setSuccessTime] = useState<string | null>(null);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
+  // Auto-fill student details if saved in Profile
+  useEffect(() => {
+    try {
+      const savedName = localStorage.getItem('profileName');
+      const savedRoll = localStorage.getItem('profileRoll');
+      if (savedName && !studentName) setStudentName(savedName);
+      if (savedRoll && !rollNumber) setRollNumber(savedRoll);
+    } catch (e) {}
+  }, []);
+
   const getDeviceId = () => {
     try {
       let id = localStorage.getItem('deviceId');
@@ -456,11 +466,14 @@ function AttendancePage({ navigateTo }: { navigateTo: (page: string) => void }) 
               placeholder="Admin Password"
               value={adminPass}
               onChange={(e) => setAdminPass(e.target.value)}
-              style={{ width: '65%', padding: '0.8rem', borderRadius: '0.5rem', border: '2px solid var(--primary)', background: 'var(--bg)', color: 'var(--text)', marginRight: '0.5rem' }}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter') toggleAdminMode();
+              }}
+              style={{ width: '62%', padding: '0.75rem 1rem', borderRadius: '10px', border: '1px solid var(--border)', background: 'var(--input-bg)', color: 'var(--text)', marginRight: '0.5rem', outline: 'none' }}
             />
             <button
               onClick={toggleAdminMode}
-              style={{ padding: '0.8rem 1.5rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: '0.5rem', fontWeight: 600, cursor: 'pointer' }}
+              style={{ padding: '0.75rem 1.4rem', background: 'var(--primary)', color: '#ffffff', border: 'none', borderRadius: '9999px', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 14px var(--primary-glow)' }}
             >
               Login
             </button>
@@ -869,7 +882,7 @@ function ContactUsPage({ navigateTo }: { navigateTo: (page: string) => void }) {
                 onChange={(e) => setMessage(e.target.value)}
               ></textarea>
             </div>
-            <button type="submit" className="submit-btn" style={{ width: '100%', padding: '1rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: '50px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer' }}>
+            <button type="submit" className="submit-btn" style={{ width: '100%', padding: '0.9rem', background: 'var(--primary)', color: '#ffffff', border: 'none', borderRadius: '9999px', fontSize: '1.05rem', fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 16px var(--primary-glow)' }}>
               Send Message
             </button>
           </form>
@@ -1100,17 +1113,39 @@ function LiveAttendancePage({ navigateTo }: { navigateTo: (page: string) => void
     setCurrentSubjectFilter(currentSubjectFilter === subj ? null : subj);
   };
 
+  const parseRowYMD = (ts: string): string => {
+    if (!ts) return '';
+    try {
+      const d = new Date(ts);
+      if (!isNaN(d.getTime())) {
+        const y = d.getFullYear();
+        const m = String(d.getMonth() + 1).padStart(2, '0');
+        const day = String(d.getDate()).padStart(2, '0');
+        return `${y}-${m}-${day}`;
+      }
+      // If timestamp is like '9/27/2026, 08:15:10 AM'
+      const parts = ts.split(',')[0].trim().split('/');
+      if (parts.length === 3) {
+        const m = parts[0].padStart(2, '0');
+        const day = parts[1].padStart(2, '0');
+        const y = parts[2].length === 2 ? '20' + parts[2] : parts[2];
+        return `${y}-${m}-${day}`;
+      }
+    } catch (e) {}
+    return '';
+  };
+
   const filteredData = allData.filter((row) => {
-    const today = new Date().toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi' });
+    const now = new Date();
+    const todayYMD = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    const rowYMD = parseRowYMD(row.timestamp || '');
+
     if (dateFilter) {
-      const rowDate = row.timestamp ? row.timestamp.split(',')[0].trim() : '';
-      const formatted = new Date(rowDate).toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi' }).split('/').reverse().join('-');
-      if (formatted !== dateFilter) return false;
+      if (rowYMD !== dateFilter) return false;
     } else if (todayOnly) {
-      const rowDate = row.timestamp ? row.timestamp.split(',')[0].trim() : '';
-      const formatted = new Date(rowDate).toLocaleDateString('en-PK', { timeZone: 'Asia/Karachi' }).split('/').reverse().join('-');
-      if (formatted !== today.split('/').reverse().join('-')) return false;
+      if (rowYMD !== todayYMD) return false;
     }
+
     if (currentSubjectFilter && row.subject !== currentSubjectFilter) {
       return false;
     }
@@ -1118,14 +1153,15 @@ function LiveAttendancePage({ navigateTo }: { navigateTo: (page: string) => void
   });
 
   const copyRollAndNames = () => {
-    if (allData.length === 0) {
-      alert('No data available to copy!');
+    const datasetToCopy = filteredData.length > 0 ? filteredData : allData;
+    if (datasetToCopy.length === 0) {
+      alert('No attendance data available to copy!');
       return;
     }
-    const text = allData.map((row) => `${row.roll} - ${row.name}`).join('\n');
+    const text = datasetToCopy.map((row) => `${row.roll} - ${row.name}`).join('\n');
     navigator.clipboard
       .writeText(text)
-      .then(() => alert('All Roll Numbers & Names copied to clipboard!'))
+      .then(() => alert(`Copied ${datasetToCopy.length} records (Roll Numbers & Names) to clipboard!`))
       .catch((err) => alert('Failed to copy: ' + err));
   };
 
@@ -1262,9 +1298,19 @@ function ProfilePage({ navigateTo }: { navigateTo: (page: string) => void }) {
     try {
       const name = localStorage.getItem('profileName');
       const roll = localStorage.getItem('profileRoll');
+      const em = localStorage.getItem('profileEmail');
+      const ph = localStorage.getItem('profilePhone');
       const av = localStorage.getItem('profileAvatar');
-      if (name) setDisplayName(name);
-      if (roll) setDisplayRoll('Roll Number: ' + roll);
+      if (name) {
+        setDisplayName(name);
+        setFullName(name);
+      }
+      if (roll) {
+        setDisplayRoll('Roll Number: ' + roll);
+        setRollNumber(roll);
+      }
+      if (em) setEmail(em);
+      if (ph) setPhone(ph);
       if (av) setAvatar(av);
     } catch (e) {}
   }, []);
@@ -1315,10 +1361,10 @@ function ProfilePage({ navigateTo }: { navigateTo: (page: string) => void }) {
       setDisplayName(trimmedName);
       setDisplayRoll('Roll Number: ' + trimmedRoll);
 
-      setFullName('');
-      setRollNumber('');
-      setEmail('');
-      setPhone('');
+      setFullName(trimmedName);
+      setRollNumber(trimmedRoll);
+      setEmail(trimmedEmail);
+      setPhone(trimmedPhone);
 
       setSuccess(true);
       setTimeout(() => setSuccess(false), 4000);
@@ -1404,7 +1450,7 @@ function ProfilePage({ navigateTo }: { navigateTo: (page: string) => void }) {
                 onChange={(e) => setPhone(e.target.value)}
               />
             </div>
-            <button className="save-btn" onClick={saveProfile} style={{ padding: '1rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: '50px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', marginTop: '1rem' }}>
+            <button className="save-btn" onClick={saveProfile} style={{ width: '100%', padding: '0.9rem', background: 'var(--primary)', color: '#ffffff', border: 'none', borderRadius: '9999px', fontSize: '1.05rem', fontWeight: 700, cursor: 'pointer', marginTop: '1.2rem', boxShadow: '0 4px 16px var(--primary-glow)' }}>
               Save Profile
             </button>
           </div>
@@ -1561,10 +1607,11 @@ function SchedulePage({ navigateTo }: { navigateTo: (page: string) => void }) {
               </select>
             </div>
             <div className="form-group">
-              <label htmlFor="time">Time Slot (Click to pick)</label>
+              <label htmlFor="time">Time Slot (e.g. 01:20 PM - 03:50 PM)</label>
               <input
-                type="time"
+                type="text"
                 id="time"
+                placeholder="e.g. 01:20 PM - 03:50 PM"
                 required
                 value={time}
                 onChange={(e) => setTime(e.target.value)}
@@ -1590,7 +1637,7 @@ function SchedulePage({ navigateTo }: { navigateTo: (page: string) => void }) {
                 <option value="Mr. Waqas Awais">Mr. Waqas Awais (Intro to Management)</option>
               </select>
             </div>
-            <button type="submit" style={{ width: '100%', padding: '1rem', background: 'var(--primary)', color: '#000', border: 'none', borderRadius: '50px', fontSize: '1.1rem', fontWeight: 600, cursor: 'pointer', marginTop: '1rem' }}>
+            <button type="submit" style={{ width: '100%', padding: '0.9rem', background: 'var(--primary)', color: '#ffffff', border: 'none', borderRadius: '9999px', fontSize: '1.05rem', fontWeight: 700, cursor: 'pointer', marginTop: '1.2rem', boxShadow: '0 4px 16px var(--primary-glow)' }}>
               Save Schedule Entry
             </button>
           </form>

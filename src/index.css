@@ -1156,6 +1156,44 @@ tr:hover {
     font-size: 0.95rem;
     color: var(--text);
 }
+.setting-item input[type="checkbox"] {
+    appearance: none;
+    -webkit-appearance: none;
+    width: 44px;
+    height: 24px;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 9999px;
+    border: 1px solid var(--border);
+    position: relative;
+    cursor: pointer;
+    outline: none;
+    transition: background 0.25s ease, border-color 0.25s ease;
+    padding: 0;
+    margin: 0;
+}
+
+.setting-item input[type="checkbox"]::after {
+    content: '';
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    width: 18px;
+    height: 18px;
+    background: #ffffff;
+    border-radius: 50%;
+    transition: transform 0.25s ease;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+}
+
+.setting-item input[type="checkbox"]:checked {
+    background: var(--primary);
+    border-color: var(--primary);
+}
+
+.setting-item input[type="checkbox"]:checked::after {
+    transform: translateX(20px);
+}
+
 .danger-btn {
     padding: 0.8rem 1.8rem;
     background: var(--danger);
