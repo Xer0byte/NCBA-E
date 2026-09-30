@@ -118,16 +118,16 @@ export default function App() {
             ✕
           </button>
         </div>
-        <button className={currentPage === 'index.html' ? 'active' : ''} onClick={() => navigateTo('index.html')}>Home</button>
-        <button className={currentPage === 'faculty.html' ? 'active' : ''} onClick={() => navigateTo('faculty.html')}>Faculty</button>
-        <button className={currentPage === 'announcements.html' ? 'active' : ''} onClick={() => navigateTo('announcements.html')}>Announcements</button>
-        <button className={currentPage === 'profile.html' ? 'active' : ''} onClick={() => navigateTo('profile.html')}>Profile</button>
-        <button className={currentPage === 'settings.html' ? 'active' : ''} onClick={() => navigateTo('settings.html')}>Settings</button>
-        <button className={currentPage === 'contact-us.html' ? 'active' : ''} onClick={() => navigateTo('contact-us.html')}>Contact Us</button>
-        <button className={currentPage === 'schedule.html' ? 'active' : ''} onClick={() => navigateTo('schedule.html')}>Schedule</button>
-        <button className={currentPage === 'attendance.html' ? 'active' : ''} onClick={() => navigateTo('attendance.html')}>Attendance</button>
-        <button className={currentPage === 'groups.html' ? 'active' : ''} onClick={() => navigateTo('groups.html')}>Groups</button>
-        <button className={currentPage === 'live-attendance.html' ? 'active' : ''} onClick={() => navigateTo('live-attendance.html')}>Live Attendance</button>
+        <button className={currentPage === 'index.html' ? 'active' : ''} onClick={() => navigateTo('index.html')}>🏠 Home</button>
+        <button className={currentPage === 'attendance.html' ? 'active' : ''} onClick={() => navigateTo('attendance.html')}>✍️ Attendance</button>
+        <button className={currentPage === 'live-attendance.html' ? 'active' : ''} onClick={() => navigateTo('live-attendance.html')}>📊 Live Attendance</button>
+        <button className={currentPage === 'schedule.html' ? 'active' : ''} onClick={() => navigateTo('schedule.html')}>📅 Schedule</button>
+        <button className={currentPage === 'faculty.html' ? 'active' : ''} onClick={() => navigateTo('faculty.html')}>👨‍🏫 Faculty</button>
+        <button className={currentPage === 'groups.html' ? 'active' : ''} onClick={() => navigateTo('groups.html')}>💬 WhatsApp Groups</button>
+        <button className={currentPage === 'announcements.html' ? 'active' : ''} onClick={() => navigateTo('announcements.html')}>📢 Announcements</button>
+        <button className={currentPage === 'profile.html' ? 'active' : ''} onClick={() => navigateTo('profile.html')}>👤 My Profile</button>
+        <button className={currentPage === 'contact-us.html' ? 'active' : ''} onClick={() => navigateTo('contact-us.html')}>📩 Contact Us</button>
+        <button className={currentPage === 'settings.html' ? 'active' : ''} onClick={() => navigateTo('settings.html')}>⚙️ Settings</button>
       </div>
 
       {/* Page Content Rendering */}
